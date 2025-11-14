@@ -1,4 +1,4 @@
-# BasicGreedy.py
+# src/BasicGreedy.py
 import numpy as np
 
 try:
