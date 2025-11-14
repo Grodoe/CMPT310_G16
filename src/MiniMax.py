@@ -25,8 +25,8 @@ class MinimaxAI:
 
         for move in moves:
             new_board = board.copy()
-            self._apply_move(new_board, move, player)
-            score = self._minimax(new_board, self.depth - 1, -player,
+            self.apply_move(new_board, move, player)
+            score = self.minimax(new_board, self.depth - 1, -player,
                                   alpha=-math.inf, beta=math.inf)
             if score > best_score:
                 best_score = score
@@ -34,44 +34,39 @@ class MinimaxAI:
 
         return best_move
 
-    # -----------------------
-    # Minimax with alpha-beta pruning
-    # -----------------------
-    def _minimax(self, board, depth, player, alpha, beta):
+
+    def minimax(self, board, depth, player, alpha, beta):
         if depth == 0 or self._is_game_over(board):
             return self._evaluate(board) 
 
         moves = get_valid_moves(board, player)
         if not moves:
             # pass turn
-            return self._minimax(board, depth - 1, -player, alpha, beta)
+            return self.minimax(board, depth - 1, -player, alpha, beta)
 
-        if player == 1:  # MAX layer
+        if player == 1:  # maximize
             max_eval = -math.inf
             for move in moves:
                 new_board = board.copy()
-                self._apply_move(new_board, move, player)
-                eval = self._minimax(new_board, depth - 1, -1, alpha, beta)
+                self.apply_move(new_board, move, player)
+                eval = self.minimax(new_board, depth - 1, -1, alpha, beta)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
                     break
             return max_eval
-        else:  # MIN layer
+        else:  # minimize
             min_eval = math.inf
             for move in moves:
                 new_board = board.copy()
-                self._apply_move(new_board, move, player)
-                eval = self._minimax(new_board, depth - 1, 1, alpha, beta)
+                self.apply_move(new_board, move, player)
+                eval = self.minimax(new_board, depth - 1, 1, alpha, beta)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
             return min_eval
 
-    # -----------------------
-    # Evaluation function
-    # -----------------------
     def _evaluate(self, board):
         # Disc difference
         my_discs = np.sum(board == 1)
@@ -91,10 +86,8 @@ class MinimaxAI:
 
         return 10 * disc_score + 5 * mobility_score + corner_score
 
-    # -----------------------
-    # Helper functions
-    # -----------------------
-    def _apply_move(self, board, move, player):
+ 
+    def apply_move(self, board, move, player):
         r, c = move
         flips = get_flips(board, r, c, player)
         board[r, c] = player
