@@ -14,10 +14,7 @@ class MinimaxAI:
     def __init__(self, depth=3):
         self.depth = depth
 
-    # -----------------------
-    # Public interface
-    # -----------------------
-    def select_move(self, board: np.ndarray, player: int):
+    def select_move(self, board, player):
         moves = get_valid_moves(board, player)
         if not moves:
             return None
@@ -39,9 +36,9 @@ class MinimaxAI:
     # -----------------------
     # Minimax with alpha-beta pruning
     # -----------------------
-    def _minimax(self, board: np.ndarray, depth: int, player: int, alpha: float, beta: float):
+    def _minimax(self, board, depth, player, alpha, beta):
         if depth == 0 or self._is_game_over(board):
-            return self._evaluate(board)
+            return self._evaluate(board) 
 
         moves = get_valid_moves(board, player)
         if not moves:
@@ -75,11 +72,6 @@ class MinimaxAI:
     # Evaluation function
     # -----------------------
     def _evaluate(self, board: np.ndarray):
-        """
-        Returns a numeric score for player 1
-        Positive = good for player 1, Negative = good for player -1
-        Combines disc difference, mobility, and corners.
-        """
         # Disc difference
         my_discs = np.sum(board == 1)
         opp_discs = np.sum(board == -1)
@@ -101,14 +93,13 @@ class MinimaxAI:
     # -----------------------
     # Helper functions
     # -----------------------
-    def _apply_move(self, board: np.ndarray, move, player: int):
-        """Apply a move on the board (modifies in-place)."""
+    def _apply_move(self, board, move, player):
         r, c = move
         flips = get_flips(board, r, c, player)
         board[r, c] = player
         for fr, fc in flips:
             board[fr, fc] = player
 
-    def _is_game_over(self, board: np.ndarray):
+    def _is_game_over(self, board):
         return len(get_valid_moves(board, 1)) == 0 and len(get_valid_moves(board, -1)) == 0
 
