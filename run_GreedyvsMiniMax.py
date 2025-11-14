@@ -11,11 +11,16 @@ MOVE_DELAY_MS = 20  # 0.2s delay after any move for readability
 
 
 def main():
-    greedy_ai = BasicGreedy() # White 
-    minimax_ai = MinimaxAI(depth = 4) # Black 
+    greedy_ai = BasicGreedy(player=BLACK) 
+    minimax_ai = MinimaxAI(depth = 3, player=WHITE) 
     screen = init_display()
     clock = pygame.time.Clock()
     game = ReversiGame()
+
+    players = {
+        BLACK: greedy_ai,
+        WHITE: minimax_ai,
+    }   
 
     game.current_player = WHITE
 
@@ -24,11 +29,8 @@ def main():
         valid_moves = game.available_moves()
         draw_board(screen, game.board, valid_moves)
 
-        if game.current_player == BLACK:
-            move = greedy_ai.select_move(game.board, game.current_player) #black turn
-
-        else:
-            move = minimax_ai.select_move(game.board, game.current_player) #white turn
+        current_player = players[game.current_player]
+        move = current_player.select_move(game.board, game.current_player)
 
         if move is not None:
                 r, c = move

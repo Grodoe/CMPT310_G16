@@ -12,8 +12,9 @@ except ModuleNotFoundError:
 
 
 class MinimaxAI:
-    def __init__(self, depth=3):
+    def __init__(self, depth=3,player=1):
         self.depth = depth
+        self.player = player
 
     def select_move(self, board, player):
         moves = get_valid_moves(board, player)
@@ -36,7 +37,7 @@ class MinimaxAI:
 
 
     def minimax(self, board, depth, player, alpha, beta):
-        if depth == 0 or self._is_game_over(board):
+        if depth == 0:
             return self._evaluate(board) 
 
         moves = get_valid_moves(board, player)
@@ -44,12 +45,12 @@ class MinimaxAI:
             # pass turn
             return self.minimax(board, depth - 1, -player, alpha, beta)
 
-        if player == 1:  # maximize
+        if player == self.player:  # maximize
             max_eval = -math.inf
             for move in moves:
                 new_board = board.copy()
                 self.apply_move(new_board, move, player)
-                eval = self.minimax(new_board, depth - 1, -1, alpha, beta)
+                eval = self.minimax(new_board, depth - 1, -player, alpha, beta)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -60,7 +61,7 @@ class MinimaxAI:
             for move in moves:
                 new_board = board.copy()
                 self.apply_move(new_board, move, player)
-                eval = self.minimax(new_board, depth - 1, 1, alpha, beta)
+                eval = self.minimax(new_board, depth - 1, -player, alpha, beta)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:
@@ -69,19 +70,19 @@ class MinimaxAI:
 
     def _evaluate(self, board):
         # Disc difference
-        my_discs = np.sum(board == 1)
-        opp_discs = np.sum(board == -1)
+        my_discs = np.sum(board == self.player)
+        opp_discs = np.sum(board == -self.player)
         disc_score = my_discs - opp_discs
 
         # Mobility
-        my_moves = len(get_valid_moves(board, 1))
-        opp_moves = len(get_valid_moves(board, -1))
+        my_moves = len(get_valid_moves(board, self.player))
+        opp_moves = len(get_valid_moves(board, -self.player))
         mobility_score = my_moves - opp_moves
 
         # Corners
         corners = [(0, 0), (0, 7), (7, 0), (7, 7)]
-        my_corners = sum(1 for r, c in corners if board[r, c] == 1)
-        opp_corners = sum(1 for r, c in corners if board[r, c] == -1)
+        my_corners = sum(1 for r, c in corners if board[r, c] == self.player)
+        opp_corners = sum(1 for r, c in corners if board[r, c] == -self.player)
         corner_score = 25 * (my_corners - opp_corners)
 
         return 10 * disc_score + 5 * mobility_score + corner_score
@@ -93,7 +94,3 @@ class MinimaxAI:
         board[r, c] = player
         for fr, fc in flips:
             board[fr, fc] = player
-
-    def _is_game_over(self, board):
-        return len(get_valid_moves(board, 1)) == 0 and len(get_valid_moves(board, -1)) == 0
-

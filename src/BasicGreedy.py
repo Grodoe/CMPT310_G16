@@ -11,7 +11,9 @@ except ModuleNotFoundError:
 
 class BasicGreedy:
  #Basic greedy AI, only cares about maximizing immediate flips
- 
+    def __init__(self, player=1):
+        self.player = player
+
     def select_move(self, board: np.ndarray, player: int):
         moves = get_valid_moves(board, player)
         if not moves:
