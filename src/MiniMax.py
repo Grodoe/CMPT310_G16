@@ -71,7 +71,7 @@ class MinimaxAI:
     # -----------------------
     # Evaluation function
     # -----------------------
-    def _evaluate(self, board: np.ndarray):
+    def _evaluate(self, board):
         # Disc difference
         my_discs = np.sum(board == 1)
         opp_discs = np.sum(board == -1)
