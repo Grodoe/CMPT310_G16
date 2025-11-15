@@ -7,8 +7,7 @@ from src.board import BLACK, WHITE
 from src.Random import BasicRandom
 from src.MiniMax import MinimaxAI 
 
-MOVE_DELAY_MS = 20  # 0.02s delay after any move for readability
-
+MOVE_DELAY_MS = 0
 
 def main():
     random_ai = BasicRandom(player=BLACK) 
