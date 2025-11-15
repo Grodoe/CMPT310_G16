@@ -1,4 +1,4 @@
-# run_basic_greedy.py
+# run_basic_greedy vs minimax
 import pygame
 
 from src.game import ReversiGame

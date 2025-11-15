@@ -50,7 +50,8 @@ def main():
 
         # game over
         if game.is_over():
-            print("Game Over! Score:", game.score())
+            black, white = game.score()
+            print(f"Game Over! Score — Black: {black}  White: {white}")
             running = False
 
         clock.tick(30)

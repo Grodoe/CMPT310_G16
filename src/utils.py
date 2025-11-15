@@ -16,9 +16,4 @@ def count_discs(board):
     return black, white
 
 def game_over(board):
-    from src.rules import get_flips
-    if any(get_flips(board, r, c, BLACK) for r in range(8) for c in range(8)):
-        return False
-    if any(get_flips(board, r, c, WHITE) for r in range(8) for c in range(8)):
-        return False
-    return True
+    return len(get_valid_moves(board, BLACK)) == 0 and len(get_valid_moves(board, WHITE)) == 0
