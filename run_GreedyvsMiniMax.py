@@ -7,8 +7,7 @@ from src.board import BLACK, WHITE
 from src.BasicGreedy import BasicGreedy
 from src.MiniMax import MinimaxAI 
 
-MOVE_DELAY_MS = 20  # 0.2s delay after any move for readability
-
+MOVE_DELAY_MS = 0
 
 def main():
     greedy_ai = BasicGreedy(player=BLACK) 
