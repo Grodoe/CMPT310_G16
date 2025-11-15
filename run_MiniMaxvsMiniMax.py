@@ -1,15 +1,15 @@
 import pygame
 from src.game import ReversiGame
-from src.graphic import init_display, draw_board, get_clicked_cell
+from src.graphic import init_display, draw_board
 from src.MiniMax import MinimaxAI
 
-MOVE_DELAY_MS = 50  # shorten delay for multiple games
-NUM_GAMES = 10      # run 10 games
+MOVE_DELAY_MS = 0
+NUM_GAMES = 5   # games per depth matchup
 
 def play_single_game(black_ai, white_ai, display=False):
     game = ReversiGame()
+    game.current_player = 1   # black starts
     players = {1: black_ai, -1: white_ai}
-    game.current_player = 1  # Black starts
 
     if display:
         screen = init_display()
@@ -19,45 +19,81 @@ def play_single_game(black_ai, white_ai, display=False):
 
     while not game.is_over():
         valid_moves = game.available_moves()
+
         if display:
             draw_board(screen, game.board, valid_moves)
 
-        current_ai = players[game.current_player]
-        move = current_ai.select_move(game.board, game.current_player)
+        ai = players[game.current_player]
+        move = ai.select_move(game.board, game.current_player)
 
-        if move is not None:
+        if move:
             r, c = move
             game.step_move(r, c)
             if display:
                 pygame.time.wait(MOVE_DELAY_MS)
         else:
-            game.current_player *= -1  # pass turn
+            game.current_player *= -1  # pass
 
         if display:
             clock.tick(30)
 
-    black_score, white_score = game.score()
-    return black_score, white_score
+    return game.score()  # returns (black_score, white_score)
+
 
 def main():
-    black_ai = MinimaxAI(depth=3, player=1)
-    white_ai = MinimaxAI(depth=3, player=-1)
+    matchups = [(1, 2), (2, 3), (3, 4)]
+    results_summary = {}
 
-    point_differences = []
+    for d1, d2 in matchups:
+    
+        print(f"      MATCHUP {d1} vs {d2}")
 
-    for i in range(NUM_GAMES):
-        print(f"\nStarting Game {i+1}")
-        black, white = play_single_game(black_ai, white_ai, display=False)  # set True to watch
-        diff = black - white
-        point_differences.append(diff)
-        print(f"Game {i+1} finished — Black: {black}, White: {white}, Difference: {diff}")
 
-    print("\nAll games finished!")
-    print("Point differences per game:", point_differences)
-    avg_diff = sum(point_differences) / len(point_differences)
-    print("Average point difference (Black - White):", avg_diff)
+        # normal
+        print(f"\n--- Normal: Black = depth {d1}, White = depth {d2} ---")
+        black_ai = MinimaxAI(depth=d1, player=1)
+        white_ai = MinimaxAI(depth=d2, player=-1)
+
+        diffs_normal = []
+
+        for g in range(NUM_GAMES):
+            black, white = play_single_game(black_ai, white_ai, display=False)
+            diff = white - black
+            diffs_normal.append(diff)
+            print(f"Game {g+1}: Black={black}  White={white}  Diff(white-black)={diff}")
+
+        avg_normal = sum(diffs_normal) / NUM_GAMES
+        print(f"Average Diff (White - Black) normal: {avg_normal:.2f}")
+
+        # swapped
+        print(f"\n--- Swapped: Black = depth {d2}, White = depth {d1} ---")
+        black_ai = MinimaxAI(depth=d2, player=1)
+        white_ai = MinimaxAI(depth=d1, player=-1)
+
+        diffs_swap = []
+
+        for g in range(NUM_GAMES):
+            black, white = play_single_game(black_ai, white_ai, display=False)
+            diff = white - black
+            diffs_swap.append(diff)
+            print(f"Game {g+1}: Black={black}  White={white}  Diff(white-black)={diff}")
+
+        avg_swap = sum(diffs_swap) / NUM_GAMES
+        print(f"Average Diff (White - Black) swapped: {avg_swap:.2f}")
+
+        # store in summary
+        results_summary[(d1, d2)] = (avg_normal, avg_swap)
+
+    # final summary
+ 
+    print("        FINAL SUMMARY")
+
+
+    for (d1, d2), (avgN, avgS) in results_summary.items():
+        print(f"{d1} vs {d2}:  Normal Avg={avgN:.2f},  Swapped Avg={avgS:.2f}")
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
